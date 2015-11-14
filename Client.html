@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8" />
+
+<title>Websocket Dev Task</title>
+
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:8025/websockets/messenger";
+  var output;
+
+  function randomMessage(){
+    return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+  }
+
+  function init()
+  {
+    output = document.getElementById("output");
+    webSocketMessenger();
+  }
+  
+  function doChangeState(){
+    var changeStateButton = document.getElementById("changeStateButton");
+    if(changeStateButton.innerHTML=="Connect"){
+        init();
+        changeStateButton.innerHTML="Disconnect";
+    }else{
+        doSend("quit");
+        websocket.close();
+        changeStateButton.innerHTML="Connect";
+    }
+  }
+
+  function webSocketMessenger()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+    doSend(randomMessage());
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    writeToScreen('<span style="color: blue;">RECEIVED: ' + evt.data+'</span>');
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+    doChangeState();
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message); 
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", doChangeState, false);
+
+</script>
+
+<h2>Messages</h2>
+
+<button id="changeStateButton" onclick="doChangeState()">Connect</button>
+<button onclick="doSend(randomMessage())">Send random text</button>
+
+<div id="output"></div>

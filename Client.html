@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <meta charset="utf-8" />
 
@@ -18,7 +18,7 @@
     output = document.getElementById("output");
     webSocketMessenger();
   }
-  
+
   function doChangeState(){
     var changeStateButton = document.getElementById("changeStateButton");
     if(changeStateButton.innerHTML=="Connect"){
@@ -48,7 +48,8 @@
 
   function onClose(evt)
   {
-    writeToScreen("DISCONNECTED");
+      writeToScreen("DISCONNECTED");
+      document.getElementById("changeStateButton").innerHTML = "Connect";
   }
 
   function onMessage(evt)
@@ -58,13 +59,14 @@
 
   function onError(evt)
   {
-    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-    doChangeState();
+      writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+      websocket.close();
+      document.getElementById("changeStateButton").innerHTML = "Connect";
   }
 
   function doSend(message)
   {
-    writeToScreen("SENT: " + message); 
+    writeToScreen("SENT: " + message);
     websocket.send(message);
   }
 
